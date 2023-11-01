@@ -65,15 +65,20 @@ local int ht_get_hash(const char *s, const int buckets, const int attempt) {
 }
 
 void ht_insert(ht_hash_table *ht, const char *key, const char *value) {
-    ht_item *new_item = ht_new_item(key, value);
+    ht_item *item = ht_new_item(key, value);
     int attempt = 0;
     int index = ht_get_hash(key, ht->size, attempt);
     ht_item *curr_item = ht->items[index];
     while (curr_item != 0 && curr_item != &HT_DELETED_ITEM) {
-        index = ht_get_hash(new_item->key, ht->size, ++attempt);
+        if (strcmp(key, curr_item->key)) {
+            ht_del_item(curr_item);
+            ht->items[index] = item;
+            return;
+        }
+        index = ht_get_hash(item->key, ht->size, ++attempt);
         curr_item = ht->items[index];
     }
-    ht->items[index] = new_item;
+    ht->items[index] = item;
     ht->count++;
 }
 
