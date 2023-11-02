@@ -43,6 +43,14 @@ local void ht_resize(ht_hash_table *ht, int base_size) {
     ht_del_hash_table(new_ht);
 }
 
+local void ht_resize_up(ht_hash_table *ht) {
+    ht_resize(ht, ht->base_size * 2);
+}
+
+local void ht_resize_down(ht_hash_table *ht) {
+    ht_resize(ht, ht->base_size / 2);
+}
+
 local ht_item *ht_new_item(const char *k, const char *v) {
     ht_item *i = malloc(sizeof(ht_item));
     i->key = strdup(k);
@@ -96,6 +104,10 @@ local int ht_get_hash(const char *s, const int buckets, const int attempt) {
 }
 
 void ht_insert(ht_hash_table *ht, const char *key, const char *value) {
+    // doubling the size of the table if the table is 70% filled
+    const int load = (ht->count * 100) / ht->size;
+    if (load > 70) ht_resize_up(ht);
+
     ht_item *item = ht_new_item(key, value);
     int attempt = 0;
     int index = ht_get_hash(key, ht->size, attempt);
@@ -129,6 +141,11 @@ char *ht_search(ht_hash_table *ht, const char *key) {
 }
 
 void ht_delete(ht_hash_table *ht, const char *key) {
+    // cuttin the size in two if the table is 10% filled
+    // AND if it was resized up at least once
+    const int load = (ht->count * 100) / ht->size;
+    if (load < 10) ht_resize_down(ht);
+
     int attempt = 0;
     int index = ht_get_hash(key, ht->size, attempt);
     ht_item *item = ht->items[index];
