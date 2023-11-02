@@ -16,6 +16,8 @@ void ht_insert(ht_hash_table *ht, const char *key, const char *value);
 void ht_delete(ht_hash_table *ht, const char *key);
 char *ht_search(ht_hash_table *ht, const char *key);
 
+// it's important for HT_PRIME_* to be bigger than
+// the number of ASCII symbols
 #define HT_PRIME_1 151
 #define HT_PRIME_2 163
 #define HT_INITIAL_BASE_SIZE 53

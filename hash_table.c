@@ -6,8 +6,8 @@
 #include "hash_table.h"
 #include "prime.h"
 
+// hash table that uses open addressing for collision resolution
 local ht_item HT_DELETED_ITEM = {0, 0};
-
 
 local ht_hash_table *ht_new_sized(const int base_size) {
     ht_hash_table *ht = malloc(sizeof(ht_hash_table));
@@ -82,7 +82,7 @@ void ht_del_hash_table(ht_hash_table *ht) {
 }
 
 // bash hash function
-local int ht_hash(const char *s, const int a, const int m) {
+local int ht_hash(const char *s, const int a, const int buckets) {
     long hash = 0;
     // TODO: replace with my strlen function
     int l = strlen(s);
@@ -90,7 +90,7 @@ local int ht_hash(const char *s, const int a, const int m) {
     while (i < l) {
         // TODO: replace pow with my own function
         hash += (long) pow(a, (l - (i + 1))) * s[i];
-        hash %= m;
+        hash %= buckets;
         i++;
     }
     return (int) hash;
@@ -100,9 +100,14 @@ local int ht_hash(const char *s, const int a, const int m) {
 local int ht_get_hash(const char *s, const int buckets, const int attempt) {
     const int hash_a = ht_hash(s, HT_PRIME_1, buckets);
     const int hash_b = ht_hash(s, HT_PRIME_2, buckets);
+    // hash_b + 1 in case hash_b is 0
     return (hash_a + (attempt * (hash_b + 1)) % buckets);
 }
 
+// in all hash table operations we have attempt, which is an additional input
+// for hash functions. each attempt beyond 0 tries to calculate
+// the next index for this key, in case the initial calculated
+// index is occupied
 void ht_insert(ht_hash_table *ht, const char *key, const char *value) {
     // doubling the size of the table if the table is 70% filled
     const int load = (ht->count * 100) / ht->size;
@@ -125,21 +130,6 @@ void ht_insert(ht_hash_table *ht, const char *key, const char *value) {
     ht->count++;
 }
 
-char *ht_search(ht_hash_table *ht, const char *key) {
-    int attempt = 0;
-    int index = ht_get_hash(key, ht->size, attempt);
-    ht_item *item = ht->items[index];
-    while (item != 0) {
-        // TODO: replace with my own function
-        if (strcmp(key, item->key) == 0 && item != &HT_DELETED_ITEM) {
-            return item->value;
-        }
-        index = ht_get_hash(key, ht->size, ++attempt);
-        item = ht->items[index];
-    }
-    return (0);
-}
-
 void ht_delete(ht_hash_table *ht, const char *key) {
     // cuttin the size in two if the table is 10% filled
     // AND if it was resized up at least once
@@ -158,4 +148,19 @@ void ht_delete(ht_hash_table *ht, const char *key) {
         item = ht->items[index];
     }
     ht->count--;
+}
+
+char *ht_search(ht_hash_table *ht, const char *key) {
+    int attempt = 0;
+    int index = ht_get_hash(key, ht->size, attempt);
+    ht_item *item = ht->items[index];
+    while (item != 0) {
+        // TODO: replace with my own function
+        if (strcmp(key, item->key) == 0 && item != &HT_DELETED_ITEM) {
+            return item->value;
+        }
+        index = ht_get_hash(key, ht->size, ++attempt);
+        item = ht->items[index];
+    }
+    return (0);
 }
