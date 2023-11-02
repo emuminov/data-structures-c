@@ -2,9 +2,9 @@
 #include <string.h>
 #include <math.h>
 
-#include "base.h"
+#include "../base.h"
+#include "../prime/prime.h"
 #include "hash_table.h"
-#include "prime.h"
 
 // hash table that uses open addressing for collision resolution
 local ht_item HT_DELETED_ITEM = {0, 0};
