@@ -4,8 +4,44 @@
 
 #include "base.h"
 #include "hash_table.h"
+#include "prime.h"
 
 local ht_item HT_DELETED_ITEM = {0, 0};
+
+
+local ht_hash_table *ht_new_sized(const int base_size) {
+    ht_hash_table *ht = malloc(sizeof(ht_hash_table));
+    ht->base_size = base_size;
+    ht->size = next_prime(base_size);
+    ht->count = 0;
+    // TODO: add my own calloc implemention
+    ht->items = calloc(ht->size, sizeof(ht_item*));
+    return ht;
+}
+
+local void ht_resize(ht_hash_table *ht, int base_size) {
+    if (ht->base_size < HT_INITIAL_BASE_SIZE) return;
+    ht_hash_table *new_ht = ht_new_sized(base_size);
+    int i = 0;
+    while (i < ht->size) {
+        ht_item *item = ht->items[i];
+        if (item != 0 && item != &HT_DELETED_ITEM) {
+            ht_insert(new_ht, item->key, item->value);
+        }
+    }
+    ht->base_size = base_size;
+    ht->count = new_ht->count;
+
+    int tmp_size = ht->size;
+    ht->size = new_ht->size;
+    new_ht->size = tmp_size;
+    
+    ht_item **tmp_items = ht->items;
+    ht->items = new_ht->items;
+    new_ht->items = tmp_items;
+
+    ht_del_hash_table(new_ht);
+}
 
 local ht_item *ht_new_item(const char *k, const char *v) {
     ht_item *i = malloc(sizeof(ht_item));
@@ -15,12 +51,7 @@ local ht_item *ht_new_item(const char *k, const char *v) {
 }
 
 ht_hash_table *ht_new() {
-    ht_hash_table *ht = malloc(sizeof(ht_hash_table));
-    ht->size = 53;
-    ht->count = 0;
-    // TODO: replace with my implementation of calloc
-    ht->items = calloc((size_t)ht->size, sizeof(ht_item*));
-    return ht;
+    return ht_new_sized(HT_INITIAL_BASE_SIZE);
 }
 
 local void ht_del_item(ht_item *i) {
