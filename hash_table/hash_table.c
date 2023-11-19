@@ -40,7 +40,7 @@ local void ht_resize(ht_hash_table *ht, int base_size) {
     ht->items = new_ht->items;
     new_ht->items = tmp_items;
 
-    ht_del_hash_table(new_ht);
+    ht_delete(new_ht);
 }
 
 local void ht_resize_up(ht_hash_table *ht) {
@@ -68,7 +68,7 @@ local void ht_del_item(ht_item *i) {
     free(i);
 }
 
-void ht_del_hash_table(ht_hash_table *ht) {
+void ht_delete(ht_hash_table *ht) {
     int i = 0;
     while (i < ht->count) {
         ht_item *item = ht->items[i];
@@ -130,7 +130,7 @@ void ht_insert(ht_hash_table *ht, const char *key, const char *value) {
     ht->count++;
 }
 
-void ht_delete(ht_hash_table *ht, const char *key) {
+void ht_remove(ht_hash_table *ht, const char *key) {
     // cuttin the size in two if the table is 10% filled
     // AND if it was resized up at least once
     const int load = (ht->count * 100) / ht->size;
