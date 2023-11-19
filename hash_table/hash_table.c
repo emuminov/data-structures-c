@@ -118,6 +118,7 @@ void ht_insert(ht_hash_table *ht, const char *key, const char *value) {
     int index = ht_get_hash(key, ht->size, attempt);
     ht_item *curr_item = ht->items[index];
     while (curr_item != 0 && curr_item != &HT_DELETED_ITEM) {
+		// REPLACEEE with ft_strcmp
         if (strcmp(key, curr_item->key)) {
             ht_del_item(curr_item);
             ht->items[index] = item;
@@ -164,3 +165,4 @@ char *ht_search(ht_hash_table *ht, const char *key) {
     }
     return (0);
 }
+
