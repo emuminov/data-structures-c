@@ -1,16 +1,23 @@
-int is_prime(int x) {
-    if (x < 2) return 0;
-    if (x == 2 || x == 3) return 1;
-    if (x % 2 == 0) return 0;
-    int i = 3;
-    while (i * i <= x) {
-        if (x % i == 0) return 0;
-        i += 2;
-    }
-    return 1;
+#include "../base.h"
+
+bool is_prime(int n)
+{
+	if (n < 2) return false;
+	if (n == 2 || n == 3) return true;
+	if (n % 2 == 0) return false;
+	long i = 3;
+	while (i * i <= n) {
+		if (n % i == 0) return false;
+		i += 2;
+	}
+	return true;
 }
 
-int next_prime(int x) {
-    while (!is_prime(x)) x++;
-    return x;
+int next_prime(int n)
+{
+	if (n < 2) return 2;
+	if (n == 2) return 3;
+	if (n % 2 == 0) n++;
+	while (!is_prime(n)) n += 2;
+	return n;
 }
