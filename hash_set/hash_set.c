@@ -6,15 +6,15 @@ local int d = -1;
 local int *DELETED_ITEM = &d;
 
 // FNV-1a hash
-unsigned int hash(int n) {
-	unsigned long hash = FNV_OFFSET;
+unsigned long long hash(int n) {
+	unsigned long long hash = FNV_OFFSET;
 	int i = 0;
 	while (i <= 3) {
 		hash ^= ((unsigned char *)&n)[i];
 		hash *= FNV_PRIME;
 		i++;
 	}
-	return (unsigned int) hash;
+	return hash;
 }
 
 local hs_set *hs_new_sized(size_t base_size) {
