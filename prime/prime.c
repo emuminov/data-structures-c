@@ -15,8 +15,7 @@ bool is_prime(int n)
 
 int next_prime(int n)
 {
-	if (n < 2) return 2;
-	if (n == 2) return 3;
+	if (n <= 2) return 2;
 	if (n % 2 == 0) n++;
 	while (!is_prime(n)) n += 2;
 	return n;
